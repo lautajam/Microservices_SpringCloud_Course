@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.lautajam.Plato.repository.IPlatoRepository;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -44,15 +43,9 @@ public class PlatoService implements IPlatoService {
             listaIngredientes = null;
         }
 
-        //System.out.println("plato.getNombrePlato(): " + plato.getNombrePlato());
-        //System.out.println("plato.getPrecioPlato(): " + plato.getPrecioPlato());
-        //System.out.println("plato.getDescripcionPlato(): " + plato.getDescripcionPlato());
-
         Plato platoNuevo = new Plato(plato.getNombrePlato(),
                                      plato.getPrecioPlato(),
                                      plato.getDescripcionPlato());
-
-       // System.out.println("platoNuevo: " + platoNuevo.toString());
 
         if (listaIngredientes.isEmpty()) {
             platoNuevo.setListaIngredientes(null);
@@ -63,13 +56,16 @@ public class PlatoService implements IPlatoService {
         List<String> nombresIngredientes = new ArrayList<>();
         System.out.println("listaIngredientes: " + listaIngredientes);
         
-        for (Ingrediente ingrediente : listaIngredientes) {
-            System.out.println("nombreIngrediente: " + ingrediente.getNombreIngrediente());
+        for (Object ingrediente : listaIngredientes) {
+            Map<String, Object> ingMap = (Map<String, Object>) ingrediente; // Hacemos un casting a Map
+            nombresIngredientes.add((String) ingMap.get("nombreIngrediente")); // Accedemos al valor
         }
         
         System.out.println("nombresIngredientes: " + nombresIngredientes);
-
+        
         platoNuevo.setListaIngredientes(nombresIngredientes);
+        
+        System.out.println("platoNuevo: " + platoNuevo.toString());
 
         platoRepository.save(plato);
     }
