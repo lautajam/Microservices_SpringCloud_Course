@@ -24,50 +24,48 @@ public class PlatoService implements IPlatoService {
         return platoRepository.findAll();
     }
 
+    public List<String> generarListaNombresIngredientes(List<Ingrediente> listaIngredientes){
+        List<String> nombresIngredientes = new ArrayList<>();
+        
+        for (Object ingrediente : listaIngredientes) {
+            Map<String, Object> ingMap = (Map<String, Object>) ingrediente;
+            nombresIngredientes.add((String) ingMap.get("nombreIngrediente"));
+        }
+        
+        return nombresIngredientes;
+    }
+    
     @Override
-    public void crearPlato(Plato plato) {
+    public Plato crearPlato(Plato plato) {
 
         List<Ingrediente> listaIngredientes = new ArrayList<>();
-
-        try {
-            String urlApiIngredientes = "http://localhost:9002/ingredientes/traerIngredientesPorPlato/"
-                    + plato.getNombrePlato();
-
-            //System.out.println("urlApiIngredientes: " + urlApiIngredientes);
-
-            listaIngredientes = apiIngredientes.getForObject(urlApiIngredientes, List.class);
-
-            System.out.println("listaIngredientes: " + listaIngredientes);
-
-        } catch (Exception e) {
-            listaIngredientes = null;
-        }
 
         Plato platoNuevo = new Plato(plato.getNombrePlato(),
                                      plato.getPrecioPlato(),
                                      plato.getDescripcionPlato());
 
-        if (listaIngredientes.isEmpty()) {
+        try {
+            String urlApiIngredientes = "http://localhost:9002/ingredientes/traerIngredientesPorPlato/"
+                    + plato.getNombrePlato();
+
+            listaIngredientes = apiIngredientes.getForObject(urlApiIngredientes, List.class);
+        } catch (Exception e) {   
             platoNuevo.setListaIngredientes(null);
             platoRepository.save(plato);
-            return;
+            return platoNuevo;
         }
 
-        List<String> nombresIngredientes = new ArrayList<>();
-        System.out.println("listaIngredientes: " + listaIngredientes);
-        
-        for (Object ingrediente : listaIngredientes) {
-            Map<String, Object> ingMap = (Map<String, Object>) ingrediente; // Hacemos un casting a Map
-            nombresIngredientes.add((String) ingMap.get("nombreIngrediente")); // Accedemos al valor
+        if(listaIngredientes == null || listaIngredientes.isEmpty()){
+            platoNuevo.setListaIngredientes(null);
+            platoRepository.save(plato);
+            return platoNuevo;
         }
+                
+        platoNuevo.setListaIngredientes(generarListaNombresIngredientes(listaIngredientes));
         
-        System.out.println("nombresIngredientes: " + nombresIngredientes);
+        platoRepository.save(platoNuevo);
         
-        platoNuevo.setListaIngredientes(nombresIngredientes);
-        
-        System.out.println("platoNuevo: " + platoNuevo.toString());
-
-        platoRepository.save(plato);
+        return platoNuevo;
     }
 
     @Override

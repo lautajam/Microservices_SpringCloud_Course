@@ -43,13 +43,11 @@ public class PlatoController {
     @PostMapping("/crearPlato")
     public ResponseEntity<Plato> crearPlato(@RequestBody Plato plato){
         
-        System.out.println("Nombre plato: "+ plato.getNombrePlato());
-
         try {
             if(plato.getNombrePlato().isEmpty())
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
-            platoService.crearPlato(plato);
-            return new ResponseEntity<>(plato,HttpStatus.CREATED);
+            Plato platoNuevo = platoService.crearPlato(plato);      
+            return new ResponseEntity<>(platoNuevo,HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

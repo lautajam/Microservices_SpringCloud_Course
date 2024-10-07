@@ -8,7 +8,7 @@ public interface IPlatoService {
 
     public List<Plato> traerPlatos();
     
-    public void crearPlato(Plato plato);
+    public Plato crearPlato(Plato plato);
     
     public void eliminarPlato(long idPlato);
     
